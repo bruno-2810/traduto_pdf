@@ -1,0 +1,19 @@
+{
+  "name": "tradutor_pdf_web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
+    "pdf-parse": "^1.1.1",
+    "pdfkit": "^0.16.0"
+  }
+}

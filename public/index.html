@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="imagex/png" href="./dmklogousuarioamarelo (1).ico">
+    <link rel="stylesheet" href="./style.css">
+    <title>TranslateMonk</title>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Tradutor de PDF</h2>
+        <p>Facilitar a vida do dev ninja</p>
+    </div>
+    <div>
+        <br>
+        <input type="file" id="inpFile">
+        <button type="button" id="btnUpload">Upload</button>
+        <br>
+        <br>
+    </div>
+
+    <textarea id="resultText" placeholder="Seu conteúdo aparecerá aqui..."></textarea>
+    <div id="loadingText" style="display: none; font-size: 18px; color: rgb(255, 255, 255);">Carregando...</div>
+
+    <script>
+        document.getElementById("resultText").style.fontSize = '16px';
+        document.getElementById("resultText").style.fontFamily = "kanitregular"
+        const inpFile = document.getElementById("inpFile")
+        const btnUpload = document.getElementById("btnUpload")
+        const resultText = document.getElementById("resultText")
+        const loadingText = document.getElementById("loadingText")
+
+        btnUpload.addEventListener("click", () => {
+            if (!inpFile.files[0]) {
+                alert("Por favor, selecione um arquivo.");
+                return;
+            }
+
+            loadingText.style.display = "block";  
+            resultText.value = ""; 
+
+            const formData = new FormData()
+            formData.append("pdfFile", inpFile.files[0])
+
+            fetch("/extract-file", {
+                method: "post",
+                body: formData
+            }).then(response => {
+                return response.text()
+            }).then(extractedText => {
+                resultText.value = extractedText
+                loadingText.style.display = "none";  
+            }).catch(err => {
+                loadingText.style.display = "none";
+                resultText.value = "Erro ao processar o arquivo.";
+                console.error(err);
+            })
+        })
+    </script>
+
+</body>
+
+</html>

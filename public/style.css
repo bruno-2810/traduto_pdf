@@ -1,0 +1,36 @@
+@font-face {
+    font-family: "kanitregular";
+    src: url(./Kanit-Regular.ttf);
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'kanitregular';
+    background-color: rgb(53, 51, 50);
+    color: white;
+    text-align: center;
+}
+
+input{
+    border-radius: 12px;
+    margin-right: 15px;
+}
+
+button{
+    border-radius: 12px;
+    padding: 7px 15px;
+}
+
+button:hover{
+    cursor: pointer;
+}
+
+textarea{
+    width: 60%;
+    height: 50vh;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+}
