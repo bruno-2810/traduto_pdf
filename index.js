@@ -9,6 +9,14 @@ app.use("/", express.static("public"));
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res, next) => {
+    try {
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } catch (error) {
+      next(error);
+    }
+  });
+
 app.post("/extract-file", async (req, res) => {
     if (!req.files || !req.files.pdfFile) {
         return res.status(400).send("Nenhum arquivo enviado.");
