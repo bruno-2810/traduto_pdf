@@ -7,6 +7,7 @@ const app = express();
 
 app.use("/", express.static("public"));
 app.use(fileUpload());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.post("/extract-file", async (req, res) => {
     if (!req.files || !req.files.pdfFile) {
