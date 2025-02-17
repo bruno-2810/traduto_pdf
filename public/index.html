@@ -45,7 +45,7 @@
             const formData = new FormData()
             formData.append("pdfFile", inpFile.files[0])
 
-            fetch("/extract-file", {
+            fetch("http://127.0.0.1:3000/extract-file", {
                 method: "post",
                 body: formData
             }).then(response => {
