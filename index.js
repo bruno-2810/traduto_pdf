@@ -2,30 +2,46 @@ const express = require("express");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const pdfParse = require("pdf-parse");
+const PDFDocument = require("pdfkit");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-
 app.use(cors());
-app.use("/", express.static("public"));
 app.use(fileUpload());
 
 app.post("/extract-file", async (req, res) => {
     if (!req.files || !req.files.pdfFile) {
-        return res.status(400).send("Nenhum arquivo enviado.");
+        return res.status(400).json({ error: "Nenhum arquivo enviado." });
     }
 
     try {
         const pdfFile = req.files.pdfFile;
-        const result = await pdfParse(pdfFile.data); 
-        const genAI = new GoogleGenerativeAI("AIzaSyDHwvo-DhnVeFyVC4xMCNOQn4w4rUS6d6E");
+        const result = await pdfParse(pdfFile.data);
+
+        const genAI = new GoogleGenerativeAI("AIzaSyCFJ92Np17gzuY_RDIN-PNaMCbMdSieYYI"); 
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = "Traduza para portugues, me retorne apenas o texto sem dizer nada, identifique titulo, subtitulo, numero de pagina, capitulos, conteudo e formate o espaçamento e não retorne o numero das paginas. As vezes o numero da pagina pode estar antes do capitulo, verifique sempre" + result.text
+        const prompt = "Traduza para português e formate corretamente, ignore o número das páginas que podem aparecer em lugares diferentes, retorne sem mensagem extra, identifique os titulos com - e me mande apenas o conteúdo:\n\n" + result.text;
+
         const translate = await model.generateContent(prompt);
-        res.send(translate.response.text());
+        const translatedText = translate.response.text();
+
+        // Criar PDF em memória
+        const doc = new PDFDocument();
+        let pdfBuffer = [];
+
+        doc.on("data", chunk => pdfBuffer.push(chunk));
+        doc.on("end", () => {
+            res.json({
+                translatedText,
+                pdfBase64: Buffer.concat(pdfBuffer).toString("base64")
+            });
+        });
+
+        doc.fontSize(14).text(translatedText, { align: "left" });
+        doc.end();
     } catch (error) {
         console.error("Erro ao processar o PDF:", error);
-        res.status(500).send("Erro ao processar o arquivo.");
+        res.status(500).json({ error: "Erro ao processar o arquivo." });
     }
 });
 

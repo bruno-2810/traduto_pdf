@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="imagex/png" href="./dmklogousuarioamarelo (1).ico">
     <link rel="stylesheet" href="./style.css">
     <title>TranslateMonk</title>
 </head>
@@ -12,26 +11,24 @@
 <body>
     <div class="header">
         <h2>Tradutor de PDF</h2>
-        <p>Facilitar a vida do dev ninja</p>
-    </div>
-    <div>
-        <br>
-        <input type="file" id="inpFile">
-        <button type="button" id="btnUpload">Upload</button>
-        <br>
-        <br>
+        <p>Facilitando a vida do dev ninja!</p>
     </div>
 
-    <textarea id="resultText" placeholder="Seu conteúdo aparecerá aqui..."></textarea>
-    <div id="loadingText" style="display: none; font-size: 18px; color: rgb(255, 255, 255);">Carregando...</div>
+    <div>
+        <input type="file" id="inpFile">
+        <button type="button" id="btnUpload">Enviar</button>
+    </div>
+    <textarea id="resultText" placeholder="Seu conteúdo aparecerá aqui..." readonly></textarea>
+
+    <div id="loadingText" style="display: none; font-size: 18px; color: white;">Carregando...</div>
+    <button type="button" id="btnDownload" style="display: none;">Baixar PDF</button>
 
     <script>
-        document.getElementById("resultText").style.fontSize = '16px';
-        document.getElementById("resultText").style.fontFamily = "kanitregular"
-        const inpFile = document.getElementById("inpFile")
-        const btnUpload = document.getElementById("btnUpload")
-        const resultText = document.getElementById("resultText")
-        const loadingText = document.getElementById("loadingText")
+        const inpFile = document.getElementById("inpFile");
+        const btnUpload = document.getElementById("btnUpload");
+        const resultText = document.getElementById("resultText");
+        const loadingText = document.getElementById("loadingText");
+        const btnDownload = document.getElementById("btnDownload");
 
         btnUpload.addEventListener("click", () => {
             if (!inpFile.files[0]) {
@@ -39,28 +36,48 @@
                 return;
             }
 
-            loadingText.style.display = "block";  
-            resultText.value = ""; 
+            loadingText.style.display = "block";
+            resultText.value = "";
+            btnDownload.style.display = "none";
 
-            const formData = new FormData()
-            formData.append("pdfFile", inpFile.files[0])
+            const formData = new FormData();
+            formData.append("pdfFile", inpFile.files[0]);
 
-            fetch("http://127.0.0.1:3000/extract-file", {
-                method: "post",
+            fetch("https://tradutor-pdf.vercel.app/extract-file", {
+                method: "POST",
                 body: formData
-            }).then(response => {
-                return response.text()
-            }).then(extractedText => {
-                resultText.value = extractedText
-                loadingText.style.display = "none";  
-            }).catch(err => {
-                loadingText.style.display = "none";
-                resultText.value = "Erro ao processar o arquivo.";
-                console.error(err);
             })
-        })
-    </script>
+                .then(response => response.json())
+                .then(data => {
+                    resultText.value = data.translatedText;
+                    loadingText.style.display = "none";
+                    btnDownload.style.display = "block";
 
+                    // Criar um Blob para o PDF traduzido
+                    const byteCharacters = atob(data.pdfBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: "application/pdf" });
+
+                    btnDownload.onclick = () => {
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(blob);
+                        a.download = "arquivo_traduzido.pdf";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+                })
+                .catch(err => {
+                    loadingText.style.display = "none";
+                    resultText.value = "Erro ao processar o arquivo.";
+                    console.error(err);
+                });
+        });
+    </script>
 </body>
 
 </html>
