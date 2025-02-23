@@ -53,7 +53,6 @@
                     loadingText.style.display = "none";
                     btnDownload.style.display = "block";
 
-                    // Criar um Blob para o PDF traduzido
                     const byteCharacters = atob(data.pdfBase64);
                     const byteNumbers = new Array(byteCharacters.length);
                     for (let i = 0; i < byteCharacters.length; i++) {
