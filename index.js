@@ -4,6 +4,7 @@ const fileUpload = require("express-fileupload");
 const pdfParse = require("pdf-parse");
 const PDFDocument = require("pdfkit");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+require('dotenv').config()
 
 const app = express();
 app.use(cors());

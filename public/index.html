@@ -43,7 +43,7 @@
             const formData = new FormData();
             formData.append("pdfFile", inpFile.files[0]);
 
-            fetch("https://tradutor-pdf.vercel.app/extract-file", {
+            fetch("https://tradutor-pdf.onrender.com/extract-file", {  
                 method: "POST",
                 body: formData
             })
