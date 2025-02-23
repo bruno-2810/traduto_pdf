@@ -4,11 +4,17 @@ const fileUpload = require("express-fileupload");
 const pdfParse = require("pdf-parse");
 const PDFDocument = require("pdfkit");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const path = require("path");
 require('dotenv').config()
 
 const app = express();
 app.use(cors());
 app.use(fileUpload());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  });
 
 app.post("/extract-file", async (req, res) => {
     if (!req.files || !req.files.pdfFile) {
@@ -19,14 +25,13 @@ app.post("/extract-file", async (req, res) => {
         const pdfFile = req.files.pdfFile;
         const result = await pdfParse(pdfFile.data);
 
-        const genAI = new GoogleGenerativeAI("AIzaSyCFJ92Np17gzuY_RDIN-PNaMCbMdSieYYI"); 
+        const genAI = new GoogleGenerativeAI(process.env.CHAVE); 
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = "Traduza para português e formate corretamente, ignore o número das páginas que podem aparecer em lugares diferentes, retorne sem mensagem extra, identifique os titulos com - e me mande apenas o conteúdo:\n\n" + result.text;
 
         const translate = await model.generateContent(prompt);
         const translatedText = translate.response.text();
 
-        // Criar PDF em memória
         const doc = new PDFDocument();
         let pdfBuffer = [];
 
